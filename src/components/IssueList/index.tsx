@@ -1,7 +1,8 @@
 import { issuesQueryKey } from "@/constants/queryKeys";
 import { SERVER_URL } from "@/constants/server";
-import { Issue } from "@/types/issue";
+import { IssueInterface } from "@/types/issue";
 import { useQuery } from "react-query";
+import { Issue } from "../Issue";
 
 async function fetchIssues() {
   const response = await fetch(`${SERVER_URL}/issues`);
@@ -10,20 +11,17 @@ async function fetchIssues() {
 }
 
 export const IssueList = () => {
-  const { data: issues, isLoading } = useQuery<Issue[]>(issuesQueryKey, fetchIssues);
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const { data: issues, isLoading } = useQuery<IssueInterface[]>(
+    issuesQueryKey,
+    fetchIssues
+  );
 
   return (
     <div>
       <h1 className="text-2xl font-bold mb-8">Issues</h1>
-      {issues.map((issue) => (
-        <div key={issue.id} className="bg-slate-200 px-4 py-8 rounded-md mb-4">
-          <h2 className="text-xl font-bold">{issue.title}</h2>
-          <p>{issue.description}</p>
-        </div>
+      {isLoading && <p>Loading...</p>}
+      {issues?.map((issue) => (
+        <Issue key={issue.id} issue={issue} />
       ))}
     </div>
   );
