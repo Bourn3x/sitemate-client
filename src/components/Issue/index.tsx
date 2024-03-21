@@ -27,20 +27,42 @@ const updateIssue = async ({
   return response.json();
 };
 
+const deleteIssue = async ({ id }: { id: number }) => {
+  const response = await fetch(`${SERVER_URL}/issues/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response.json();
+};
+
 export const Issue = ({ issue }: Props) => {
   const [isEditing, setIsEditing] = useState(false);
   const titleRef = useRef<HTMLInputElement | null>(null);
   const descriptionRef = useRef<HTMLInputElement | null>(null);
 
   const queryClient = useQueryClient();
-  const mutation = useMutation({
+  const updateMutation = useMutation({
     mutationFn: updateIssue,
     onSuccess: () => {
       queryClient.invalidateQueries(issuesQueryKey);
       setIsEditing(false);
+      toast.success("Successfully updated issue!");
     },
     onError: () => {
       toast.error("Error updating issue");
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteIssue,
+    onSuccess: () => {
+      queryClient.invalidateQueries(issuesQueryKey);
+      toast.success("Successfully deleted issue!");
+    },
+    onError: () => {
+      toast.error("Error deleting issue");
     },
   });
 
@@ -55,7 +77,11 @@ export const Issue = ({ issue }: Props) => {
       toast.error("Title is required");
       return;
     }
-    mutation.mutate({ id: issue.id, title, description }); // Assuming the updateIssue function takes the issue object as an argument
+    updateMutation.mutate({ id: issue.id, title, description });
+  };
+
+  const handleDelete = () => {
+    deleteMutation.mutate({ id: issue.id });
   };
 
   return (
@@ -79,12 +105,20 @@ export const Issue = ({ issue }: Props) => {
       )}
 
       {!isEditing && (
-        <button
-          className="block mt-4 bg-blue-300 py-2 px-4 rounded-xl text-xs font-bold mr-4"
-          onClick={() => setIsEditing(true)}
-        >
-          Edit
-        </button>
+        <div className="flex">
+          <button
+            className="block mt-4 bg-blue-300 py-2 px-4 rounded-xl text-xs font-bold mr-4"
+            onClick={() => setIsEditing(true)}
+          >
+            Edit
+          </button>
+          <button
+            className="block mt-4 bg-red-300 py-2 px-4 rounded-xl text-xs font-bold mr-4"
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+        </div>
       )}
 
       {isEditing && (
