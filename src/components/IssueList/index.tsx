@@ -18,7 +18,7 @@ export const IssueList = () => {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-8">Issues</h1>
+      <h1 className="text-2xl font-bold mb-8">Issues 📒</h1>
       {isLoading && <p>Loading...</p>}
       {issues?.map((issue) => (
         <Issue key={issue.id} issue={issue} />
