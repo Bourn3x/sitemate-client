@@ -1,11 +1,14 @@
+import { issuesQueryKey } from "@/constants/queryKeys";
 import { SERVER_URL } from "@/constants/server";
 import { useRef } from "react";
+import { useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export const CreateIssue = () => {
   const titleRef = useRef<HTMLInputElement | null>(null);
   const descriptionRef = useRef<HTMLInputElement | null>(null);
+  const queryClient = useQueryClient();
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
@@ -33,6 +36,7 @@ export const CreateIssue = () => {
       toast.success("Issue created successfully");
       titleRef.current!.value = "";
       descriptionRef.current!.value = "";
+      queryClient.invalidateQueries(issuesQueryKey)
     } catch (error) {
       toast.error("Error creating issue");
     }
